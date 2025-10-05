@@ -1,6 +1,6 @@
 "use client";
 
-
+import { useEffect, useState } from "react";
 import { useState } from "react";
 import {
   Brain,
@@ -568,7 +568,6 @@ const translations = {
     viewResults: "View Results",
   },
 };
-import { useEffect, useState } from "react";
 
 export default function IQTest() {
   const [language, setLanguage] = useState("pt");
