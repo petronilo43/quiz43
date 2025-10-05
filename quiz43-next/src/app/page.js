@@ -568,6 +568,7 @@ const translations = {
     viewResults: "View Results",
   },
 };
+import { useEffect, useState } from "react";
 
 export default function IQTest() {
   const [language, setLanguage] = useState("pt");
@@ -579,6 +580,22 @@ export default function IQTest() {
   const [testStarted, setTestStarted] = useState(false);
   const [startTime, setStartTime] = useState(null);
   const [endTime, setEndTime] = useState(null);
+  const [paid, setPaid] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const wasPaid = localStorage.getItem("iq_paid") === "1";
+    if (wasPaid) {
+      setPaid(true);
+      setShowPayment(false);
+      setShowResults(true); // mostra os resultados direto
+      // (opcional) carregar respostas salvas
+      // const saved = localStorage.getItem("iq_answers");
+      // if (saved) setAnswers(JSON.parse(saved));
+      // (opcional) limpar o flag para não “permanecer pago” em novos testes
+      // localStorage.removeItem("iq_paid");
+    }
+  }, []);
 
   
   const t = translations[language];
@@ -623,29 +640,52 @@ export default function IQTest() {
 
   };
  async function goToCheckout() {
+  // 1) Salva as respostas locais para restaurar depois de pagar
   try {
-    const res = await fetch("/api/checkout", { method: "POST" });
+    localStorage.setItem("iq_answers", JSON.stringify(answers));
+      const meta = {
+    language,
+    // se quiser tempo real, salve antes no state quando o teste termina e ponha aqui
+    // timeSpentMinutes: seuValorAqui
+  };
+  localStorage.setItem("iq_meta", JSON.stringify(meta));
+  } catch {}
 
+  try {
+    // 2) Chama sua API server-side que cria a sessão do Stripe
+    const res = await fetch("/api/checkout", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      // body: JSON.stringify({ plan: "basic" }) // se precisar enviar algo
+    });
+
+    // 3) Garante que veio JSON (evita confundir HTML de erro da Vercel)
     const ct = res.headers.get("content-type") || "";
     if (!ct.includes("application/json")) {
-      const text = await res.text(); // provavelmente HTML de erro
-      alert("Resposta não-JSON da API:\n" + text.slice(0, 300));
+      const text = await res.text();
+      alert("Erro inesperado (resposta não-JSON):\n" + text.slice(0, 400));
       return;
     }
 
     const data = await res.json();
+
+    // 4) Se o server retornou erro, mostra mensagem amigável
     if (!res.ok) {
       alert(data?.error || "Erro ao criar checkout.");
       return;
     }
 
+    // 5) Se veio a URL do Stripe, redireciona
     if (data?.url) {
       window.location.href = data.url;
-    } else {
-      alert("Resposta inválida do servidor.");
+      return;
     }
+
+    // 6) Caso não venha URL, algo está errado no server
+    alert("Resposta inválida do servidor (sem URL do checkout).");
   } catch (e) {
-    alert(e?.message || "Falha ao iniciar o pagamento.");
+    // 7) Falha de rede/JS
+    alert("Falha ao iniciar o pagamento: " + (e?.message || "erro desconhecido"));
   }
 }
   
@@ -750,7 +790,7 @@ export default function IQTest() {
           </div>
 
           {/* Botão pagar (Stripe Checkout) */}
-          <Button onClick={goToCheckout} className="w-full">
+          <Button onClick={goToCheckout} className="w-full px-4 py-2 rounded bg-black text-white">
             Pagar €0,99
           </Button>
 

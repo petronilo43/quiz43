@@ -34,8 +34,8 @@ export async function POST() {
           quantity: 1,
         },
       ],
-    success_url: `${siteUrl}/success?session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${siteUrl}/?canceled=1`,
+    success_url: `${process.env.NEXT_PUBLIC_SITE_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
+cancel_url: `${process.env.NEXT_PUBLIC_SITE_URL}/`,
       metadata: { product: "iq_results" },
     });
 
