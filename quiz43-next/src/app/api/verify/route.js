@@ -8,6 +8,7 @@ export async function GET(req) {
     if (!secret) {
       return Response.json({ error: "STRIPE_SECRET_KEY ausente" }, { status: 500 });
     }
+
     const { searchParams } = new URL(req.url);
     const sessionId = searchParams.get("session_id");
     if (!sessionId) {
@@ -18,9 +19,7 @@ export async function GET(req) {
     const session = await stripe.checkout.sessions.retrieve(sessionId);
 
     const paid =
-      session.payment_status === "paid" ||
-      session.status === "complete" ||
-      session.amount_total === session.amount_subtotal; // redundância ok
+      session.payment_status === "paid" || session.status === "complete";
 
     return Response.json({
       paid,
