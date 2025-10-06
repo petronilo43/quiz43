@@ -615,14 +615,8 @@ const handleAnswer = (answerIndex) => {
   newExistingAnswers[currentQuestion] = answerIndex;
   setAnswers(newExistingAnswers);
   
-  // Lógica para próxima pergunta
-  if (currentQuestion < questions.length - 1) {
-    setCurrentQuestion((q) => q + 1);
-  } else {
-    setEndTime(new Date());
-    setShowPayment(true);
-    calcularResultado(newAnswers); // Chama o cálculo do resultado
-  }
+  // ✅ AGORA SÓ ARMAZENA A RESPOSTA - NÃO MUDA DE PERGUNTA
+  // A mudança de pergunta continua sendo feita pelos botões "Próxima" e "Anterior"
 };
   const nextQuestion = () => {
     if (currentQuestion < questions.length - 1) {
@@ -636,10 +630,15 @@ const handleAnswer = (answerIndex) => {
     }
   };
 
-  const finishTest = () => {
-    setEndTime(new Date());
-    setShowPayment(true);
-  };
+const finishTest = () => {
+  setEndTime(new Date());
+  
+  // ✅ CALCULA O RESULTADO FINAL AQUI
+  calcularResultado(userAnswers);
+  
+  // Mostra o pagamento (ou resultados se quiser testar)
+  setShowPayment(true);
+};
   const calcularResultado = (userAnswers) => {
   let acertos = 0;
   
