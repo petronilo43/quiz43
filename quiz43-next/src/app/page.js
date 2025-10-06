@@ -1,5 +1,5 @@
 "use client";
-
+import { RESPOSTAS_CORRETAS } from '@/constants/answers';
 import { useEffect, useState } from "react";
 import {
   Brain,
@@ -579,6 +579,7 @@ export default function IQTest() {
   const [startTime, setStartTime] = useState(null);
   const [endTime, setEndTime] = useState(null);
   const [paid, setPaid] = useState(false);
+  const [userAnswers, setUserAnswers] = useState([]);
 
 useEffect(() => {
   if (typeof window === "undefined") return;
@@ -603,12 +604,26 @@ useEffect(() => {
   
   const t = translations[language];
 
-  const handleAnswer = (answerIndex) => {
-    const newAnswers = [...answers];
-    newAnswers[currentQuestion] = answerIndex;
-    setAnswers(newAnswers);
-  };
-
+const handleAnswer = (answerIndex) => {
+  // Armazena a resposta do usuário
+  const newAnswers = [...userAnswers];
+  newAnswers[currentQuestion] = answerIndex;
+  setUserAnswers(newAnswers);
+  
+  // Atualiza também o array answers existente (para compatibilidade)
+  const newExistingAnswers = [...answers];
+  newExistingAnswers[currentQuestion] = answerIndex;
+  setAnswers(newExistingAnswers);
+  
+  // Lógica para próxima pergunta
+  if (currentQuestion < questions.length - 1) {
+    setCurrentQuestion((q) => q + 1);
+  } else {
+    setEndTime(new Date());
+    setShowPayment(true);
+    calcularResultado(newAnswers); // Chama o cálculo do resultado
+  }
+};
   const nextQuestion = () => {
     if (currentQuestion < questions.length - 1) {
       setCurrentQuestion((q) => q + 1);
@@ -625,6 +640,31 @@ useEffect(() => {
     setEndTime(new Date());
     setShowPayment(true);
   };
+  const calcularResultado = (userAnswers) => {
+  let acertos = 0;
+  
+  // Compara cada resposta com o gabarito
+  userAnswers.forEach((resposta, index) => {
+    if (resposta === RESPOSTAS_CORRETAS[index]) {
+      acertos++;
+    }
+  });
+  
+  // Calcula o QI (escala 70-130)
+  const porcentagemAcertos = (acertos / RESPOSTAS_CORRETAS.length) * 100;
+  const qi = Math.round(70 + (porcentagemAcertos / 100) * 60);
+  
+  // Atualiza o estado do resultado (você precisará criar este estado)
+  console.log("Resultado calculado:", { qi, acertos, total: RESPOSTAS_CORRETAS.length, porcentagem: porcentagemAcertos.toFixed(1) });
+  
+  // Aqui você pode salvar o resultado para mostrar depois do pagamento
+  localStorage.setItem("iq_result", JSON.stringify({
+    qi: qi,
+    acertos: acertos,
+    total: RESPOSTAS_CORRETAS.length,
+    porcentagem: porcentagemAcertos.toFixed(1)
+  }));
+};
 
   const startTest = () => {
     setTestStarted(true);
