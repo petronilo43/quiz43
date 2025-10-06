@@ -1,5 +1,4 @@
 "use client";
-import { RESPOSTAS_CORRETAS } from '@/constants/answers';
 import { useEffect, useState } from "react";
 import {
   Brain,
@@ -490,6 +489,9 @@ const questions = [
   },
 ];
 
+const TOTAL_QUESTIONS = questions.length;
+const CORRECT_ANSWERS = questions.map((question) => question.correct);
+
 const translations = {
   pt: {
     title: "Teste de QI",
@@ -572,14 +574,13 @@ const translations = {
 export default function IQTest() {
   const [language, setLanguage] = useState("pt");
   const [currentQuestion, setCurrentQuestion] = useState(0);
-  const [answers, setAnswers] = useState(new Array(32).fill(-1));
+  const [answers, setAnswers] = useState(() => new Array(TOTAL_QUESTIONS).fill(-1));
   const [showResults, setShowResults] = useState(false);
   const [showPayment, setShowPayment] = useState(false);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
   const [testStarted, setTestStarted] = useState(false);
   const [startTime, setStartTime] = useState(null);
   const [endTime, setEndTime] = useState(null);
-  const [userAnswers, setUserAnswers] = useState([]);
   const [paid, setPaid] = useState(false);
   const [resultadoCalculado, setResultadoCalculado] = useState(null);
 
@@ -592,7 +593,9 @@ useEffect(() => {
       const saved = localStorage.getItem("iq_answers");
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length === 32) setAnswers(parsed);
+        if (Array.isArray(parsed) && parsed.length === TOTAL_QUESTIONS) {
+          setAnswers(parsed);
+        }
       }
       const s = localStorage.getItem("iq_start");
       const e = localStorage.getItem("iq_end");
@@ -608,17 +611,9 @@ useEffect(() => {
   const t = translations[language];
 
 const handleAnswer = (answerIndex) => {
-  // Armazena a resposta do usuário
-  const newAnswers = [...userAnswers];
-  newAnswers[currentQuestion] = answerIndex;
-  setUserAnswers(newAnswers);
-  
-  // Atualiza também o array answers existente (para compatibilidade)
-  const newExistingAnswers = [...answers];
-  newExistingAnswers[currentQuestion] = answerIndex;
-  setAnswers(newExistingAnswers);
-  
-  // ✅ AGORA SÓ ARMAZENA A RESPOSTA - NÃO MUDA DE PERGUNTA AUTOMATICAMENTE
+  const updatedAnswers = [...answers];
+  updatedAnswers[currentQuestion] = answerIndex;
+  setAnswers(updatedAnswers);
 };
   const nextQuestion = () => {
     if (currentQuestion < questions.length - 1) {
@@ -634,32 +629,35 @@ const handleAnswer = (answerIndex) => {
 
 const finishTest = () => {
   setEndTime(new Date());
-  calcularResultado(userAnswers); // ← ADICIONE ESTA LINHA
+  calcularResultado(answers);
   setShowPayment(true);
 };
-const calcularResultado = (userAnswers) => {
-  console.log("🔍 DEBUG - userAnswers:", userAnswers);
-  console.log("🔍 DEBUG - RESPOSTAS_CORRETAS:", RESPOSTAS_CORRETAS);
+const calcularResultado = (selectedAnswers) => {
+  console.log("🔍 DEBUG - selectedAnswers:", selectedAnswers);
+  console.log("🔍 DEBUG - CORRECT_ANSWERS:", CORRECT_ANSWERS);
   
   let acertos = 0;
   
   // Compara cada resposta com o gabarito
-  userAnswers.forEach((resposta, index) => {
-    const estaCorreta = resposta === RESPOSTAS_CORRETAS[index];
-    console.log(`🔍 Pergunta ${index + 1}: Usuário = ${resposta}, Correto = ${RESPOSTAS_CORRETAS[index]}, Acertou = ${estaCorreta}`);
+  selectedAnswers.forEach((resposta, index) => {
+    const respostaCorreta = CORRECT_ANSWERS[index];
+    const estaCorreta = resposta === respostaCorreta;
+    console.log(
+      `🔍 Pergunta ${index + 1}: Usuário = ${resposta}, Correto = ${respostaCorreta}, Acertou = ${estaCorreta}`
+    );
     
     if (estaCorreta) {
       acertos++;
     }
   });
   
-  const porcentagemAcertos = (acertos / RESPOSTAS_CORRETAS.length) * 100;
+  const porcentagemAcertos = (acertos / TOTAL_QUESTIONS) * 100;
   const qi = Math.round(70 + (porcentagemAcertos * 0.6));
   
   const resultado = {
     qi: qi,
     acertos: acertos,
-    total: RESPOSTAS_CORRETAS.length,
+    total: TOTAL_QUESTIONS,
     porcentagem: porcentagemAcertos.toFixed(1)
   };
   
@@ -798,14 +796,16 @@ const renderResults = (resultado) => {
 
   const restartTest = () => {
     setCurrentQuestion(0);
-    setAnswers(new Array(32).fill(-1));
+    setAnswers(new Array(TOTAL_QUESTIONS).fill(-1));
     setShowResults(false);
     setShowPayment(false);
     setPaymentSuccess(false);
+    setResultadoCalculado(null);
     setTestStarted(false);
     setStartTime(null);
     setEndTime(null);
-
+    localStorage.removeItem("iq_answers");
+    localStorage.removeItem("iq_result");
   };
 async function goToCheckout() {
   try {
@@ -851,7 +851,7 @@ async function goToCheckout() {
   };
 
   const calculateIQ = (score) => {
-    const percentage = (score / 32) * 100;
+    const percentage = (score / TOTAL_QUESTIONS) * 100;
     if (percentage >= 90) return 140 + Math.floor((percentage - 90) * 2);
     if (percentage >= 80) return 120 + Math.floor((percentage - 80) * 2);
     if (percentage >= 70) return 110 + Math.floor((percentage - 70) * 1);
@@ -861,7 +861,7 @@ async function goToCheckout() {
   };
 
   const getPerformanceLevel = (score) => {
-    const percentage = (score / 32) * 100;
+    const percentage = (score / TOTAL_QUESTIONS) * 100;
     if (percentage >= 85) return t.excellent;
     if (percentage >= 70) return t.good;
     if (percentage >= 50) return t.average;
