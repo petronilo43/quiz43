@@ -1,35 +1,35 @@
 ﻿
 export const RESPOSTAS_CORRETAS = [
-  1,  // Pergunta 1: 2,4,8,16 → 32 (índice 1)
-  1,  // Pergunta 2: Alguns gatos podem ser selvagens (índice 1)
-  2,  // Pergunta 3: Cenoura não pertence (índice 2)
-  1,  // Pergunta 4: CASA = 3+1+19+1 = 24? (índice 1) - VERIFIQUE ESTA!
-  1,  // Pergunta 5: Comida → Comer (índice 1)
-  1,  // Pergunta 6: Sequência Fibonacci → 13 (índice 1)
-  2,  // Pergunta 7: OUVIR → OUVIDO (órgão do corpo, índice 2)
-  0,  // Pergunta 8: 3 triângulos (índice 0)
-  0,  // Pergunta 9: 5 máquinas (índice 0)
-  1,  // Pergunta 10: 2,6,12,20,30 → 42 (índice 1)
-  0,  // Pergunta 11: Vapor → Nuvem (índice 0)
-  3,  // Pergunta 12: 100 dias → Quinta-feira (índice 3)
-  1,  // Pergunta 13: Sempre → Nunca (índice 1)
-  2,  // Pergunta 14: A > B > C → A > C (índice 2)
-  2,  // Pergunta 15: Cubo 3x3x3 = 27 (índice 2)
-  0,  // Pergunta 16: Z,Y,X,W → V (índice 0)
-  0,  // Pergunta 17: 6-2 = 4 (índice 0)
-  2,  // Pergunta 18: 1,4,9,16,25 → 36 (quadrados, índice 2)
-  2,  // Pergunta 19: ELEFANTE = 8 letras (índice 2)
-  1,  // Pergunta 20: 2,3,5,7,11 → 13 (primos, índice 1)
-  1,  // Pergunta 21: 60km/h → 90km em 90min (índice 1)
-  1,  // Pergunta 22: Triângulo tem 3 lados (índice 1)
-  1,  // Pergunta 23: Dobrar papel 3x → 8 seções (índice 1)
-  1,  // Pergunta 24: Noite → Lua (índice 1)
-  2,  // Pergunta 25: 9 não pertence (índice 2)
-  1,  // Pergunta 26: A=5,B=10,C=15 → D=20 (índice 1)
-  3,  // Pergunta 27: 2.5h = 150min (índice 3)
-  2,  // Pergunta 28: 12 - 1/3 = 8 (índice 2)
-  0,  // Pergunta 29: 100,81,64,49 → 36 (quadrados, índice 0)
-  2,  // Pergunta 30: FELICIDADE = 10 letras (índice 2)
-  1,  // Pergunta 31: 15% de 200 = 30 (índice 1)
-  1   // Pergunta 32: 1000 -10% 3x = 729 (índice 1)
+  0,  // Pergunta 1: primeira opção (era 1)
+  0,  // Pergunta 2: primeira opção (era 1)  
+  1,  // Pergunta 3: segunda opção (era 2)
+  0,  // Pergunta 4: primeira opção (era 1)
+  0,  // Pergunta 5: primeira opção (era 1)
+  0,  // Pergunta 6: primeira opção (era 1)
+  1,  // Pergunta 7: segunda opção (era 2)
+  0,  // Pergunta 8: primeira opção (era 0) ✅
+  0,  // Pergunta 9: primeira opção (era 0) ✅
+  0,  // Pergunta 10: primeira opção (era 1)
+  0,  // Pergunta 11: primeira opção (era 0) ✅
+  3,  // Pergunta 12: quarta opção (era 3) ✅
+  1,  // Pergunta 13: segunda opção (era 1) ✅
+  2,  // Pergunta 14: terceira opção (era 2) ✅
+  2,  // Pergunta 15: terceira opção (era 2) ✅
+  0,  // Pergunta 16: primeira opção (era 0) ✅
+  0,  // Pergunta 17: primeira opção (era 0) ✅
+  2,  // Pergunta 18: terceira opção (era 2) ✅
+  2,  // Pergunta 19: terceira opção (era 2) ✅
+  1,  // Pergunta 20: segunda opção (era 1) ✅
+  1,  // Pergunta 21: segunda opção (era 1) ✅
+  1,  // Pergunta 22: segunda opção (era 1) ✅
+  1,  // Pergunta 23: segunda opção (era 1) ✅
+  1,  // Pergunta 24: segunda opção (era 1) ✅
+  2,  // Pergunta 25: terceira opção (era 2) ✅
+  1,  // Pergunta 26: segunda opção (era 1) ✅
+  3,  // Pergunta 27: quarta opção (era 3) ✅
+  2,  // Pergunta 28: terceira opção (era 2) ✅
+  0,  // Pergunta 29: primeira opção (era 0) ✅
+  2,  // Pergunta 30: terceira opção (era 2) ✅
+  1,  // Pergunta 31: segunda opção (era 1) ✅
+  1   // Pergunta 32: segunda opção (era 1) ✅
 ];
