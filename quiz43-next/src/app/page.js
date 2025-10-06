@@ -657,7 +657,8 @@ const calcularResultado = (userAnswers) => {
     qi: qi, 
     porcentagem: porcentagemAcertos.toFixed(1) + "%" 
   });
-  
+    setResultadoCalculado(resultado);
+
   // Salva para usar depois do pagamento
   localStorage.setItem("iq_result", JSON.stringify({
     qi: qi,
@@ -953,8 +954,37 @@ async function goToCheckout() {
   );
 }
 if (paymentSuccess && resultadoCalculado) {
-  return renderResults(resultadoCalculado);
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+      <Card className="w-full max-w-md">
+        <CardHeader className="text-center">
+          <Trophy className="h-16 w-16 text-yellow-500 mx-auto mb-4" />
+          <CardTitle className="text-2xl font-bold">Resultados do Teste</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-6 text-center">
+          <div className="bg-gradient-to-r from-blue-500 to-purple-600 text-white p-8 rounded-2xl">
+            <div className="text-5xl font-bold mb-2">{resultadoCalculado.qi}</div>
+            <div className="text-lg">QI</div>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="bg-blue-50 p-4 rounded-lg">
+              <div className="text-2xl font-bold text-blue-600">{resultadoCalculado.acertos}/{resultadoCalculado.total}</div>
+              <div className="text-sm text-blue-600">Acertos</div>
+            </div>
+            <div className="bg-green-50 p-4 rounded-lg">
+              <div className="text-2xl font-bold text-green-600">{resultadoCalculado.porcentagem}%</div>
+              <div className="text-sm text-green-600">Precisão</div>
+            </div>
+          </div>
+          <Button onClick={restartTest} className="w-full">
+            Fazer Teste Novamente
+          </Button>
+        </CardContent>
+      </Card>
+    </div>
+  );
 }
+
 if (showPayment) {
  return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 to-red-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4">
