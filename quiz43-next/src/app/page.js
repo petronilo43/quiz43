@@ -10,6 +10,7 @@ import {
   CreditCard,
   Lock,
   CheckCircle,
+  Share
 } from "lucide-react";
 
 /* ----------------------------------------------------------------------------
@@ -615,8 +616,7 @@ const handleAnswer = (answerIndex) => {
   newExistingAnswers[currentQuestion] = answerIndex;
   setAnswers(newExistingAnswers);
   
-  // ✅ AGORA SÓ ARMAZENA A RESPOSTA - NÃO MUDA DE PERGUNTA
-  // A mudança de pergunta continua sendo feita pelos botões "Próxima" e "Anterior"
+  // ✅ AGORA SÓ ARMAZENA A RESPOSTA - NÃO MUDA DE PERGUNTA AUTOMATICAMENTE
 };
   const nextQuestion = () => {
     if (currentQuestion < questions.length - 1) {
@@ -639,7 +639,7 @@ const finishTest = () => {
   // Mostra o pagamento (ou resultados se quiser testar)
   setShowPayment(true);
 };
-  const calcularResultado = (userAnswers) => {
+const calcularResultado = (userAnswers) => {
   let acertos = 0;
   
   // Compara cada resposta com o gabarito
@@ -651,18 +651,177 @@ const finishTest = () => {
   
   // Calcula o QI (escala 70-130)
   const porcentagemAcertos = (acertos / RESPOSTAS_CORRETAS.length) * 100;
-  const qi = Math.round(70 + (porcentagemAcertos / 100) * 60);
+  const qi = Math.round(70 + (porcentagemAcertos * 0.6));
   
-  // Atualiza o estado do resultado (você precisará criar este estado)
-  console.log("Resultado calculado:", { qi, acertos, total: RESPOSTAS_CORRETAS.length, porcentagem: porcentagemAcertos.toFixed(1) });
+  console.log("🎯 RESULTADO FINAL:", { 
+    acertos: acertos, 
+    total: RESPOSTAS_CORRETAS.length, 
+    qi: qi, 
+    porcentagem: porcentagemAcertos.toFixed(1) + "%" 
+  });
   
-  // Aqui você pode salvar o resultado para mostrar depois do pagamento
+  // Salva para usar depois do pagamento
   localStorage.setItem("iq_result", JSON.stringify({
     qi: qi,
     acertos: acertos,
     total: RESPOSTAS_CORRETAS.length,
     porcentagem: porcentagemAcertos.toFixed(1)
   }));
+};
+const renderResults = (resultado) => {
+  if (!resultado) return null;
+  
+  const getIQCategory = (qi) => {
+    if (qi >= 130) return { 
+      label: t.excellent, 
+      color: "from-purple-600 to-pink-600", 
+      emoji: "🧠",
+      message: language === "pt" 
+        ? "Excelente! Seu QI está no nível superior." 
+        : "Excellent! Your IQ is at a superior level."
+    };
+    if (qi >= 115) return { 
+      label: t.good, 
+      color: "from-green-600 to-teal-600", 
+      emoji: "⭐",
+      message: language === "pt" 
+        ? "Muito bom! Seu QI está acima da média." 
+        : "Very good! Your IQ is above average."
+    };
+    if (qi >= 85) return { 
+      label: t.average, 
+      color: "from-blue-600 to-cyan-600", 
+      emoji: "📊",
+      message: language === "pt" 
+        ? "Bom! Seu QI está na média." 
+        : "Good! Your IQ is average."
+    };
+    return { 
+      label: t.belowAverage, 
+      color: "from-orange-500 to-red-500", 
+      emoji: "📈",
+      message: language === "pt" 
+        ? "Continue praticando para melhorar seu QI!" 
+        : "Keep practicing to improve your IQ!"
+    };
+  };
+
+  const category = getIQCategory(resultado.qi);
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4">
+      <Card className="w-full max-w-2xl">
+        <CardHeader className="text-center space-y-6">
+          <div className="flex justify-center">
+            <Trophy className="h-20 w-20 text-yellow-500" />
+          </div>
+          <CardTitle className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            {t.results}
+          </CardTitle>
+          <p className="text-lg text-neutral-600 dark:text-neutral-400">
+            {language === "pt" 
+              ? "Seu teste de QI foi concluído com sucesso!" 
+              : "Your IQ test has been completed successfully!"
+            }
+          </p>
+        </CardHeader>
+
+        <CardContent className="space-y-8">
+          {/* Score Circular */}
+          <div className="flex justify-center">
+            <div className="relative">
+              <div className={`w-48 h-48 rounded-full bg-gradient-to-br ${category.color} flex items-center justify-center shadow-lg`}>
+                <div className="w-44 h-44 rounded-full bg-white dark:bg-gray-900 flex flex-col items-center justify-center">
+                  <span className="text-4xl font-bold text-gray-900 dark:text-white">
+                    {resultado.qi}
+                  </span>
+                  <span className="text-sm text-gray-600 dark:text-gray-400">{t.iqEstimate}</span>
+                </div>
+              </div>
+              <div className={`absolute -top-2 -right-2 bg-gradient-to-r ${category.color} text-white px-4 py-2 rounded-full text-sm font-medium shadow-lg`}>
+                {category.emoji} {category.label}
+              </div>
+            </div>
+          </div>
+
+          {/* Estatísticas */}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg text-center">
+              <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                {resultado.acertos}/{resultado.total}
+              </div>
+              <div className="text-sm text-blue-600 dark:text-blue-400">
+                {language === "pt" ? "Acertos" : "Correct Answers"}
+              </div>
+            </div>
+            <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg text-center">
+              <div className="text-2xl font-bold text-green-600 dark:text-green-400">
+                {resultado.porcentagem}%
+              </div>
+              <div className="text-sm text-green-600 dark:text-green-400">
+                {language === "pt" ? "Precisão" : "Accuracy"}
+              </div>
+            </div>
+          </div>
+
+          {/* Barra de Progresso */}
+          <div className="space-y-4">
+            <div className="flex justify-between text-sm">
+              <span>{t.performance}</span>
+              <span>{resultado.porcentagem}% {language === "pt" ? "completo" : "complete"}</span>
+            </div>
+            <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
+              <div 
+                className="bg-gradient-to-r from-green-500 to-blue-500 h-3 rounded-full transition-all duration-1000 ease-out"
+                style={{ width: `${resultado.porcentagem}%` }}
+              ></div>
+            </div>
+          </div>
+
+          {/* Tempo Gasto */}
+          {startTime && endTime && (
+            <div className="bg-orange-50 dark:bg-orange-900/20 p-4 rounded-lg text-center">
+              <div className="flex items-center justify-center gap-2 mb-2">
+                <Clock className="h-5 w-5 text-orange-600" />
+                <span className="text-sm font-medium text-orange-600 dark:text-orange-400">
+                  {t.timeSpent}
+                </span>
+              </div>
+              <div className="text-xl font-bold text-orange-600 dark:text-orange-400">
+                {Math.floor((endTime - startTime) / 60000)} {t.minutes}
+              </div>
+            </div>
+          )}
+
+          {/* Categoria de QI */}
+          <div className={`bg-gradient-to-r ${category.color} text-white p-6 rounded-xl text-center`}>
+            <div className="text-2xl font-bold mb-2">
+              {category.emoji} {category.label}
+            </div>
+            <p className="text-sm opacity-90">
+              {category.message}
+            </p>
+          </div>
+
+          {/* Botões de Ação */}
+          <div className="flex gap-4">
+            <Button 
+              onClick={restartTest} 
+              variant="outline" 
+              className="flex-1"
+            >
+              <RotateCcw className="mr-2 h-4 w-4" />
+              {t.restartTest}
+            </Button>
+            <Button className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600">
+              <Share className="mr-2 h-4 w-4" />
+              {language === "pt" ? "Compartilhar Resultado" : "Share Results"}
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
 };
 
   const startTest = () => {
