@@ -581,6 +581,8 @@ export default function IQTest() {
   const [endTime, setEndTime] = useState(null);
   const [paid, setPaid] = useState(false);
   const [userAnswers, setUserAnswers] = useState([]);
+  const [resultadoCalculado, setResultadoCalculado] = useState(null);
+
 
 useEffect(() => {
   if (typeof window === "undefined") return;
@@ -632,12 +634,8 @@ const handleAnswer = (answerIndex) => {
 
 const finishTest = () => {
   setEndTime(new Date());
-  
-  // ✅ CALCULA O RESULTADO FINAL AQUI
-  calcularResultado(userAnswers);
-  
-  // Mostra o pagamento (ou resultados se quiser testar)
-  //setShowPayment(true);
+  calcularResultado(userAnswers); // ← ADICIONE ESTA LINHA
+  setShowPayment(true);
 };
 const calcularResultado = (userAnswers) => {
   let acertos = 0;
@@ -764,35 +762,6 @@ const renderResults = (resultado) => {
             </div>
           </div>
 
-          {/* Barra de Progresso */}
-          <div className="space-y-4">
-            <div className="flex justify-between text-sm">
-              <span>{t.performance}</span>
-              <span>{resultado.porcentagem}% {language === "pt" ? "completo" : "complete"}</span>
-            </div>
-            <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
-              <div 
-                className="bg-gradient-to-r from-green-500 to-blue-500 h-3 rounded-full transition-all duration-1000 ease-out"
-                style={{ width: `${resultado.porcentagem}%` }}
-              ></div>
-            </div>
-          </div>
-
-          {/* Tempo Gasto */}
-          {startTime && endTime && (
-            <div className="bg-orange-50 dark:bg-orange-900/20 p-4 rounded-lg text-center">
-              <div className="flex items-center justify-center gap-2 mb-2">
-                <Clock className="h-5 w-5 text-orange-600" />
-                <span className="text-sm font-medium text-orange-600 dark:text-orange-400">
-                  {t.timeSpent}
-                </span>
-              </div>
-              <div className="text-xl font-bold text-orange-600 dark:text-orange-400">
-                {Math.floor((endTime.getTime() - startTime.getTime()) / 60000)} {t.minutes}
-              </div>
-            </div>
-          )}
-
           {/* Categoria de QI */}
           <div className={`bg-gradient-to-r ${category.color} text-white p-6 rounded-xl text-center`}>
             <div className="text-2xl font-bold mb-2">
@@ -812,10 +781,6 @@ const renderResults = (resultado) => {
             >
               <RotateCcw className="mr-2 h-4 w-4" />
               {t.restartTest}
-            </Button>
-            <Button className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600">
-              <Share className="mr-2 h-4 w-4" />
-              {language === "pt" ? "Compartilhar Resultado" : "Share Results"}
             </Button>
           </div>
         </CardContent>
@@ -989,6 +954,38 @@ async function goToCheckout() {
 }
 if (paymentSuccess && resultadoCalculado) {
   return renderResults(resultadoCalculado);
+}
+if (showPayment) {
+ return (
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-red-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4">
+      <Card className="w-full max-w-md">
+        <CardHeader className="text-center space-y-4">
+          <div className="flex justify-center">
+            <CreditCard className="h-16 w-16 text-orange-600" />
+          </div>
+          <CardTitle className="text-2xl font-bold">{t.paymentTitle}</CardTitle>
+          <p className="text-neutral-600 dark:text-neutral-400">{t.paymentSubtitle}</p>
+        </CardHeader>
+
+        <CardContent className="space-y-6">
+          {/* Preço */}
+          <div className="bg-gradient-to-r from-red-500 to-orange-600 text-white p-4 rounded-lg text-center">
+            <div className="text-sm opacity-90 line-through">{t.originalPrice} €6,80</div>
+            <div className="text-2xl font-bold">{t.promotionalPrice} €0,99</div>
+          </div>
+
+          {/* Botão pagar (Stripe Checkout) */}
+          <Button onClick={goToCheckout} className="w-full px-4 py-2 rounded bg-black text-white">
+            Pagar €0,99
+          </Button>
+
+          <div className="text-center text-sm text-neutral-600 dark:text-neutral-400">
+            Pagamento processado com segurança pela Stripe (Apple Pay/Google Pay quando disponível).
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
 }
   const currentQ = questions[currentQuestion];
   const isAnswered = answers[currentQuestion] !== -1;
