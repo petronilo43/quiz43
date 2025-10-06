@@ -1125,6 +1125,23 @@ if (showPayment) {
           </div>
         </div>
       </div>
+      <div className="fixed bottom-4 right-4 z-50">
+        <Button 
+          onClick={() => {
+            const resultadoTeste = {
+              qi: 115,
+              acertos: 20,
+              total: 32,
+              porcentagem: "62.5"
+            };
+            setResultadoCalculado(resultadoTeste);
+            setPaymentSuccess(true);
+          }}
+          className="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg shadow-lg"
+        >
+          🧪 TESTAR RESULTADOS
+        </Button>
+      </div>
     </div>
   );
 }
