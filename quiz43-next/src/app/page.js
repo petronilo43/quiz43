@@ -638,10 +638,17 @@ const finishTest = () => {
   setShowPayment(true);
 };
 const calcularResultado = (userAnswers) => {
+  console.log("🔍 DEBUG - userAnswers:", userAnswers);
+  console.log("🔍 DEBUG - RESPOSTAS_CORRETAS:", RESPOSTAS_CORRETAS);
+  
   let acertos = 0;
   
+  // Compara cada resposta com o gabarito
   userAnswers.forEach((resposta, index) => {
-    if (resposta === RESPOSTAS_CORRETAS[index]) {
+    const estaCorreta = resposta === RESPOSTAS_CORRETAS[index];
+    console.log(`🔍 Pergunta ${index + 1}: Usuário = ${resposta}, Correto = ${RESPOSTAS_CORRETAS[index]}, Acertou = ${estaCorreta}`);
+    
+    if (estaCorreta) {
       acertos++;
     }
   });
@@ -649,7 +656,6 @@ const calcularResultado = (userAnswers) => {
   const porcentagemAcertos = (acertos / RESPOSTAS_CORRETAS.length) * 100;
   const qi = Math.round(70 + (porcentagemAcertos * 0.6));
   
-  // ↗️↗️↗️ CRIE O RESULTADO ↖️↖️↖️
   const resultado = {
     qi: qi,
     acertos: acertos,
@@ -657,9 +663,8 @@ const calcularResultado = (userAnswers) => {
     porcentagem: porcentagemAcertos.toFixed(1)
   };
   
-  // ↗️↗️↗️ SALVE NO ESTADO ↖️↖️↖️
+  console.log("🔍 RESULTADO FINAL:", resultado);
   setResultadoCalculado(resultado);
-  
   localStorage.setItem("iq_result", JSON.stringify(resultado));
   return resultado;
 };
