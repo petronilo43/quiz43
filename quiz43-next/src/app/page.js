@@ -637,7 +637,7 @@ const finishTest = () => {
   calcularResultado(userAnswers);
   
   // Mostra o pagamento (ou resultados se quiser testar)
-  setShowPayment(true);
+  //setShowPayment(true);
 };
 const calcularResultado = (userAnswers) => {
   let acertos = 0;
@@ -788,7 +788,7 @@ const renderResults = (resultado) => {
                 </span>
               </div>
               <div className="text-xl font-bold text-orange-600 dark:text-orange-400">
-                {Math.floor((endTime - startTime) / 60000)} {t.minutes}
+                {Math.floor((endTime.getTime() - startTime.getTime()) / 60000)} {t.minutes}
               </div>
             </div>
           )}
@@ -987,7 +987,9 @@ async function goToCheckout() {
     </div>
   );
 }
-
+if (paymentSuccess && resultadoCalculado) {
+  return renderResults(resultadoCalculado);
+}
   const currentQ = questions[currentQuestion];
   const isAnswered = answers[currentQuestion] !== -1;
   
