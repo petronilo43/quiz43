@@ -579,8 +579,8 @@ export default function IQTest() {
   const [testStarted, setTestStarted] = useState(false);
   const [startTime, setStartTime] = useState(null);
   const [endTime, setEndTime] = useState(null);
-  const [paid, setPaid] = useState(false);
   const [userAnswers, setUserAnswers] = useState([]);
+  const [paid, setPaid] = useState(false);
   const [resultadoCalculado, setResultadoCalculado] = useState(null);
 
 
@@ -640,32 +640,28 @@ const finishTest = () => {
 const calcularResultado = (userAnswers) => {
   let acertos = 0;
   
-  // Compara cada resposta com o gabarito
   userAnswers.forEach((resposta, index) => {
     if (resposta === RESPOSTAS_CORRETAS[index]) {
       acertos++;
     }
   });
   
-  // Calcula o QI (escala 70-130)
   const porcentagemAcertos = (acertos / RESPOSTAS_CORRETAS.length) * 100;
   const qi = Math.round(70 + (porcentagemAcertos * 0.6));
   
-  console.log("🎯 RESULTADO FINAL:", { 
-    acertos: acertos, 
-    total: RESPOSTAS_CORRETAS.length, 
-    qi: qi, 
-    porcentagem: porcentagemAcertos.toFixed(1) + "%" 
-  });
-    setResultadoCalculado(resultado);
-
-  // Salva para usar depois do pagamento
-  localStorage.setItem("iq_result", JSON.stringify({
+  // ↗️↗️↗️ CRIE O RESULTADO ↖️↖️↖️
+  const resultado = {
     qi: qi,
     acertos: acertos,
     total: RESPOSTAS_CORRETAS.length,
     porcentagem: porcentagemAcertos.toFixed(1)
-  }));
+  };
+  
+  // ↗️↗️↗️ SALVE NO ESTADO ↖️↖️↖️
+  setResultadoCalculado(resultado);
+  
+  localStorage.setItem("iq_result", JSON.stringify(resultado));
+  return resultado;
 };
 const renderResults = (resultado) => {
   if (!resultado) return null;
