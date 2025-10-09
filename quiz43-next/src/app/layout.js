@@ -3,7 +3,7 @@ import { Inter } from "next/font/google";
 
 export const metadata = {
   title: "IQ Test",
-  description: "Quiz de QI com pagamento via Stripe",
+  description: "IQ Test",
 };
 
 const inter = Inter({ subsets: ["latin"] });
